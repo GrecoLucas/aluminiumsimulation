@@ -1,10 +1,10 @@
-!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-br">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador de Cores RAL - Lacados</title>
+    <title>Estúdio de Inspeção 3D</title>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,75 +12,20 @@
 </head>
 
 <body>
-    <div id="ui-root">
-        <div class="panel">
-            <div class="header">
-                <h1>Visualizador de Produto</h1>
-                <p>Simulação de Lacagem e Luz</p>
-            </div>
-
-            <!-- Seleção de Cores -->
-            <span class="section-title">Cores RAL (Disponíveis)</span>
-            <div id="swatch-grid" class="swatch-grid">
-                <!-- Gerado dinamicamente via JS -->
-            </div>
-
-            <!-- Acabamento -->
-            <span class="section-title">Acabamento do Material</span>
-            <div class="finish-group">
-                <button id="btn-brilhante" class="finish-btn active">Brilhante</button>
-                <button id="btn-mate" class="finish-btn">Mate</button>
-                <button id="btn-metalizado" class="finish-btn">Metal/Textur</button>
-            </div>
-
-            <!-- Iluminação -->
-            <span class="section-title">Ajustes de Luz</span>
-            <div class="control-item">
-                <div class="slider-row">
-                    <input type="range" id="ambient-intensity" min="0" max="2" step="0.1" value="0.4">
-                    <span class="val-box" id="ambient-val">0.4</span>
-                </div>
-            </div>
-            <div class="control-item">
-                <span class="field-label">Luz Direcional (Sol)</span>
-                <div class="slider-row">
-                    <input type="range" id="directional-intensity" min="0" max="5" step="0.1" value="1.5">
-                    <span class="val-box" id="directional-val">1.5</span>
-                </div>
-            </div>
-
-            <div class="control-item">
-                <span class="field-label">Luz: Direção (Ângulo)</span>
-                <div class="slider-row">
-                    <input type="range" id="light-position" min="0" max="6.28" step="0.01" value="0.78">
-                </div>
-            </div>
-
-            <div class="control-item">
-                <span class="field-label">Luz: Altura (Cima/Baixo)</span>
-                <div class="slider-row">
-                    <input type="range" id="light-height" min="0" max="30" step="0.1" value="15">
-                </div>
-            </div>
-
-            <!-- Interação -->
-            <div class="toggle-row">
-                <span style="font-size: 0.8rem; font-weight: 500;">Rotação Automática</span>
-                <input type="checkbox" id="toggle-rotation">
-            </div>
-        </div>
+    <!-- Loading Screen -->
+    <div id="loading"
+        style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; display: none; z-index: 1000; font-family: 'Inter', sans-serif; font-weight: 500; padding: 15px 30px; background: rgba(0,0,0,0.7); border-radius: 8px;">
+        A carregar modelo...
     </div>
 
-    <div class="info-footer">
-        <div class="badge" id="current-color-name">RAL 1015</div>
-        <div class="badge">Produto em Pé • Clique nas cores • Arraste para orbitar</div>
-    </div>
+    <!-- Interface Lil-GUI (carregada via JS) -->
 
     <script type="importmap">
         {
             "imports": {
                 "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/",
+                "lil-gui": "https://unpkg.com/lil-gui@0.19.1/dist/lil-gui.esm.min.js"
             }
         }
     </script>

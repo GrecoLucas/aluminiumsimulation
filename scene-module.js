@@ -1,52 +1,65 @@
 import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-export const RAL_COLORS = [
-    { name: 'RAL 1015', hex: '#E6D2B5', label: 'Marfim' },
-    { name: 'RAL 3000', hex: '#AF2B1E', label: 'Vermelho Fogo' },
-    { name: 'RAL 3005', hex: '#59191F', label: 'Vermelho Vinho' },
-    { name: 'RAL 5010', hex: '#0E467F', label: 'Azul Gentiana' },
-    { name: 'RAL 5013', hex: '#1C2B4A', label: 'Azul Cobalto' },
-    { name: 'RAL 7011', hex: '#434B4D', label: 'Cinzento Ferro' },
-    { name: 'RAL 7024', hex: '#45494E', label: 'Cinzento Grafite' },
-    { name: 'RAL 7035', hex: '#D7D7D7', label: 'Cinzento Luz' },
-    { name: 'RAL 8014', hex: '#493327', label: 'Castanho Sépia' },
-    { name: 'RAL 8019', hex: '#3B3332', label: 'Castanho Cinzento' },
-    { name: 'RAL 9005', hex: '#0A0A0A', label: 'Preto' },
-    { name: 'RAL 6005', hex: '#2F4538', label: 'Verde Musgo' },
-    { name: 'RAL 6020', hex: '#354031', label: 'Verde Óxido' },
-    { name: 'RAL 9010', hex: '#FFFFFF', label: 'Branco Puro' }
-];
+export const RAL_COLORS = {
+    'RAL 1015 (Marfim)': '#E6D2B5',
+    'RAL 3000 (Vermelho Fogo)': '#AF2B1E',
+    'RAL 3005 (Vermelho Vinho)': '#59191F',
+    'RAL 5010 (Azul Gentiana)': '#0E467F',
+    'RAL 5013 (Azul Cobalto)': '#1C2B4A',
+    'RAL 7011 (Cinzento Ferro)': '#434B4D',
+    'RAL 7024 (Cinzento Grafite)': '#45494E',
+    'RAL 7035 (Cinzento Luz)': '#D7D7D7',
+    'RAL 8014 (Castanho Sépia)': '#493327',
+    'RAL 8019 (Castanho Cinzento)': '#3B3332',
+    'RAL 9005 (Preto)': '#0A0A0A',
+    'RAL 6005 (Verde Musgo)': '#2F4538',
+    'RAL 6020 (Verde Óxido)': '#354031',
+    'RAL 9010 (Branco Puro)': '#FFFFFF'
+};
 
-export const METAL_COLORS = [
-    { name: 'I5100', hex: '#D7C392', label: 'Texturado' },
-    { name: 'GS150', hex: '#9CA69C', label: 'Texturado' },
-    { name: 'GS900', hex: '#4E534E', label: 'Texturado' },
-    { name: 'NS200', hex: '#222522', label: 'Texturado' },
-    { name: 'NS900', hex: '#0D0D0D', label: 'Texturado' },
-    { name: 'BS600', hex: '#3E4748', label: 'Texturado' },
-    { name: 'VS500', hex: '#2D3D34', label: 'Texturado' },
-    { name: 'BS650', hex: '#3F3529', label: 'Texturado' },
-    { name: '7647', hex: '#454D4A', label: 'Texturado' },
-    { name: 'TXGG', hex: '#313A3C', label: 'Texturado' },
-    { name: 'Z.90', hex: '#444C55', label: 'Texturado' },
-    { name: 'MARS', hex: '#4D3321', label: 'Texturado' },
-    { name: 'MTZ9006', hex: '#A5AAB0', label: 'Metalizado' },
-    { name: 'MTZ9007', hex: '#777B75', label: 'Metalizado' }
-];
+export const METAL_COLORS = {
+    'I5100 (Texturado)': '#D7C392',
+    'GS150 (Texturado)': '#9CA69C',
+    'GS900 (Texturado)': '#4E534E',
+    'NS200 (Texturado)': '#222522',
+    'NS900 (Texturado)': '#0D0D0D',
+    'BS600 (Texturado)': '#3E4748',
+    'VS500 (Texturado)': '#2D3D34',
+    'BS650 (Texturado)': '#3F3529',
+    '7647 (Texturado)': '#454D4A',
+    'TXGG (Texturado)': '#313A3C',
+    'Z.90 (Texturado)': '#444C55',
+    'MARS (Texturado)': '#4D3321',
+    'MTZ9006 (Metalizado)': '#A5AAB0',
+    'MTZ9007 (Metalizado)': '#777B75'
+};
 
 export class SceneModule {
     constructor() {
         this.scene = new THREE.Scene();
-        this.scene.background = new THREE.Color(0x333333); // Fundo cinza solicitado
+        this.scene.background = new THREE.Color(0x222222);
 
-        this.objects = {};
+        this.objects = {
+            product: new THREE.Group() // Container wrapper para o modelo carregado
+        };
+        this.scene.add(this.objects.product);
+
         this.lights = {};
-        this.currentFinish = 'brilhante';
         this.autoRotate = false;
+        
+        // Base Material Fotorrealista para os modelos carregados
+        this.material = new THREE.MeshPhysicalMaterial({
+            color: new THREE.Color('#FFFFFF'),
+            metalness: 0.1,
+            roughness: 0.3,
+            clearcoat: 0.0,
+            clearcoatRoughness: 0.1,
+            side: THREE.DoubleSide
+        });
 
-        // Estado da luz
-        this.lightAngle = 0.78;
-        this.lightHeight = 15;
+        this.gltfLoader = new GLTFLoader();
+        this.currentLoadedModel = null;
     }
 
     initLights() {
@@ -65,31 +78,16 @@ export class SceneModule {
         this.lights.directional.shadow.camera.right = 15;
         this.lights.directional.shadow.camera.top = 15;
         this.lights.directional.shadow.camera.bottom = -15;
+        this.lights.directional.shadow.bias = -0.001;
 
         this.scene.add(this.lights.directional);
     }
 
-    initObjects() {
-        // Objeto em pé (vertical)
-        const planeGeo = new THREE.BoxGeometry(6, 9, 0.3);
-        const planeMat = new THREE.MeshPhysicalMaterial({
-            color: new THREE.Color(0xe6d2b5),
-            metalness: 0.1,
-            roughness: 0.1,
-            clearcoat: 1.0,
-            clearcoatRoughness: 0.1
-        });
-
-        this.objects.product = new THREE.Mesh(planeGeo, planeMat);
-        this.objects.product.position.y = 4.5; // Metade da altura para ficar no chão
-        this.objects.product.castShadow = true;
-        this.objects.product.receiveShadow = true;
-        this.scene.add(this.objects.product);
-
-        // Chão (Cinza escuro para contraste)
-        const floorGeo = new THREE.PlaneGeometry(100, 100);
+    initEnvironment() {
+        // Chão de estúdio (Cinza escuro para contraste)
+        const floorGeo = new THREE.PlaneGeometry(200, 200);
         const floorMat = new THREE.MeshStandardMaterial({
-            color: 0x1a1a1a,
+            color: 0x111111,
             roughness: 0.8
         });
         const floor = new THREE.Mesh(floorGeo, floorMat);
@@ -97,59 +95,70 @@ export class SceneModule {
         floor.position.y = 0;
         floor.receiveShadow = true;
         this.scene.add(floor);
+        
+        const grid = new THREE.GridHelper(50, 50, 0x444444, 0x222222);
+        grid.position.y = 0.01;
+        this.scene.add(grid);
     }
 
-    setFinish(type) {
-        this.currentFinish = type;
-        const mat = this.objects.product.material;
+    async loadModel(filename, onProgress) {
+        if (!filename) return;
 
-        if (type === 'brilhante') {
-            mat.roughness = 0.01; // Quase espelho
-            mat.metalness = 0.1;
-            mat.clearcoat = 1.0;
-            mat.clearcoatRoughness = 0.01;
-        } else if (type === 'mate') {
-            mat.roughness = 0.85;
-            mat.metalness = 0.0;
-            mat.clearcoat = 0.0;
-            mat.clearcoatRoughness = 0.0;
-        } else if (type === 'metalizado') {
-            mat.roughness = 0.15; // Metal polido mas com textura
-            mat.metalness = 0.95;
-            mat.clearcoat = 0.3;
-            mat.clearcoatRoughness = 0.1;
-        }
-    }
+        return new Promise((resolve, reject) => {
+            if (this.currentLoadedModel) {
+                this.objects.product.remove(this.currentLoadedModel);
+            }
 
-    updateColor(hex) {
-        if (this.objects.product) this.objects.product.material.color.set(hex);
-    }
+            this.gltfLoader.load(
+                `./assets/${filename}`,
+                (gltf) => {
+                    this.currentLoadedModel = gltf.scene;
 
-    updateAmbientIntensity(value) {
-        if (this.lights.ambient) this.lights.ambient.intensity = value;
-    }
+                    // Centralizar o modelo
+                    const box = new THREE.Box3().setFromObject(this.currentLoadedModel);
+                    const center = box.getCenter(new THREE.Vector3());
+                    const size = box.getSize(new THREE.Vector3());
 
-    updateDirectionalIntensity(value) {
-        if (this.lights.directional) this.lights.directional.intensity = value;
-    }
+                    // Normalizar a escala se for demasiado grande ou pequeno
+                    const maxDim = Math.max(size.x, size.y, size.z);
+                    let scale = 1;
+                    if (maxDim > 20) scale = 15 / maxDim;
+                    else if (maxDim < 1) scale = 5 / maxDim;
+                    
+                    this.currentLoadedModel.scale.setScalar(scale);
+                    
+                    // Reposicionar para o centro na base Y=0 local do product
+                    this.currentLoadedModel.position.x = -center.x * scale;
+                    this.currentLoadedModel.position.y = -center.y * scale + (size.y * scale) / 2;
+                    this.currentLoadedModel.position.z = -center.z * scale;
 
-    updateDirectionalPosition(angle) {
-        this.lightAngle = angle;
-        this._updateLightPos();
-    }
+                    // Aplicar material unificado e sombras
+                    this.currentLoadedModel.traverse((child) => {
+                        if (child.isMesh) {
+                            child.material = this.material;
+                            child.castShadow = true;
+                            child.receiveShadow = true;
+                        }
+                    });
 
-    updateDirectionalHeight(height) {
-        this.lightHeight = height;
-        this._updateLightPos();
-    }
+                    this.objects.product.add(this.currentLoadedModel);
+                    
+                    // Fazer reset das transformações do grupo `product`
+                    this.objects.product.position.set(0, 0, 0);
+                    this.objects.product.rotation.set(0, 0, 0);
+                    this.objects.product.scale.set(1, 1, 1);
 
-    _updateLightPos() {
-        if (this.lights.directional) {
-            const radius = 15;
-            this.lights.directional.position.x = Math.cos(this.lightAngle) * radius;
-            this.lights.directional.position.z = Math.sin(this.lightAngle) * radius;
-            this.lights.directional.position.y = this.lightHeight;
-        }
+                    resolve(this.currentLoadedModel);
+                },
+                (xhr) => {
+                    if (onProgress) onProgress((xhr.loaded / xhr.total) * 100);
+                },
+                (error) => {
+                    console.error('Erro a carregar o modelo', error);
+                    reject(error);
+                }
+            );
+        });
     }
 
     updateRotation(delta) {
