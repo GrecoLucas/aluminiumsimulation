@@ -47,7 +47,7 @@ export class SceneModule {
 
         this.lights = {};
         this.autoRotate = false;
-        
+
         // Base Material Fotorrealista para os modelos carregados
         this.material = new THREE.MeshPhysicalMaterial({
             color: new THREE.Color('#FFFFFF'),
@@ -95,7 +95,7 @@ export class SceneModule {
         floor.position.y = 0;
         floor.receiveShadow = true;
         this.scene.add(floor);
-        
+
         const grid = new THREE.GridHelper(50, 50, 0x444444, 0x222222);
         grid.position.y = 0.01;
         this.scene.add(grid);
@@ -107,6 +107,38 @@ export class SceneModule {
         return new Promise((resolve, reject) => {
             if (this.currentLoadedModel) {
                 this.objects.product.remove(this.currentLoadedModel);
+            }
+
+            if (filename.startsWith('primitive:')) {
+                const type = filename.split(':')[1];
+                let geo;
+                if (type === 'cube') geo = new THREE.BoxGeometry(4, 4, 4);
+                else if (type === 'cylinder') geo = new THREE.CylinderGeometry(2, 2, 8, 32);
+                else if (type === 'sphere') geo = new THREE.SphereGeometry(3, 64, 64);
+
+                const mesh = new THREE.Mesh(geo, this.material);
+                mesh.castShadow = true;
+                mesh.receiveShadow = true;
+
+                this.currentLoadedModel = new THREE.Group();
+                this.currentLoadedModel.add(mesh);
+
+                const box = new THREE.Box3().setFromObject(this.currentLoadedModel);
+                const center = box.getCenter(new THREE.Vector3());
+                const size = box.getSize(new THREE.Vector3());
+
+                this.currentLoadedModel.position.x = -center.x;
+                this.currentLoadedModel.position.y = -center.y + (size.y) / 2;
+                this.currentLoadedModel.position.z = -center.z;
+
+                this.objects.product.add(this.currentLoadedModel);
+
+                this.objects.product.position.set(0, 0, 0);
+                this.objects.product.rotation.set(0, 0, 0);
+                this.objects.product.scale.set(1, 1, 1);
+
+                resolve(this.currentLoadedModel);
+                return;
             }
 
             this.gltfLoader.load(
@@ -124,9 +156,9 @@ export class SceneModule {
                     let scale = 1;
                     if (maxDim > 20) scale = 15 / maxDim;
                     else if (maxDim < 1) scale = 5 / maxDim;
-                    
+
                     this.currentLoadedModel.scale.setScalar(scale);
-                    
+
                     // Reposicionar para o centro na base Y=0 local do product
                     this.currentLoadedModel.position.x = -center.x * scale;
                     this.currentLoadedModel.position.y = -center.y * scale + (size.y * scale) / 2;
@@ -142,7 +174,7 @@ export class SceneModule {
                     });
 
                     this.objects.product.add(this.currentLoadedModel);
-                    
+
                     // Fazer reset das transformações do grupo `product`
                     this.objects.product.position.set(0, 0, 0);
                     this.objects.product.rotation.set(0, 0, 0);

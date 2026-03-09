@@ -40,6 +40,10 @@ class App {
         };
 
         this.modelsList = {
+            'Cubo (Teste)': 'primitive:cube',
+            'Cilindro (Teste)': 'primitive:cylinder',
+            'Esfera (Teste)': 'primitive:sphere',
+            '--- Modelos GLB ---': '',
             'Conection': 'conection.glb',
             'Cylinder': 'cylinder.glb',
             'Machine Parts': 'machine_parts.glb',
@@ -132,7 +136,7 @@ class App {
         this.guiControllers = {};
 
         // 📁 Modelo
-        const folderModel = this.gui.addFolder('📦 Modelo');
+        const folderModel = this.gui.addFolder('Modelo');
         folderModel.add(this.params, 'model', this.modelsList).name('Ficheiro GLB').onChange(v => {
             this.params.model = v;
             this.loadInitialModel();
@@ -150,7 +154,7 @@ class App {
         // folderModel.open();
 
         // 📁 Material
-        const folderMat = this.gui.addFolder('🎨 Material');
+        const folderMat = this.gui.addFolder('Material');
 
         const allColors = { 'Branco Puro': '#FFFFFF', ...RAL_COLORS, ...METAL_COLORS };
 
@@ -170,7 +174,7 @@ class App {
         folderMat.add(this.params, 'clearcoatRoughness', 0, 1).name('Rug. Verniz').onChange(v => this.sceneModule.material.clearcoatRoughness = v);
 
         // 📁 Iluminação
-        const folderLight = this.gui.addFolder('💡 Iluminação');
+        const folderLight = this.gui.addFolder('Iluminação');
         folderLight.add(this.params, 'roomEnvironment').name('Reflexos Estúdio (HDRI)').onChange(v => {
             this.sceneModule.scene.environment = v ? this.roomEnvTexture : null;
             this.sceneModule.material.needsUpdate = true;
@@ -187,7 +191,7 @@ class App {
         folderLight.add(this.params, 'dirZ', -30, 30).name('Posição Luz Z').onChange(v => { this.sceneModule.lights.directional.position.z = v; });
 
         // 📁 Câmara
-        const folderCam = this.gui.addFolder('🎥 Câmara');
+        const folderCam = this.gui.addFolder('Câmara');
         folderCam.add(this.params, 'autoRotate').name('Rotação Automática').onChange(v => {
             this.sceneModule.autoRotate = v;
         });
