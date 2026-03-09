@@ -50,8 +50,8 @@ export class SceneModule {
 
         // Base Material Fotorrealista para os modelos carregados
         this.material = new THREE.MeshPhysicalMaterial({
-            color: new THREE.Color('#FFFFFF'),
-            metalness: 0.1,
+            color: new THREE.Color('#E6D2B5'),
+            metalness: 1.0,
             roughness: 0.3,
             clearcoat: 0.0,
             clearcoatRoughness: 0.1,
@@ -154,8 +154,14 @@ export class SceneModule {
                     // Normalizar a escala se for demasiado grande ou pequeno
                     const maxDim = Math.max(size.x, size.y, size.z);
                     let scale = 1;
-                    if (maxDim > 20) scale = 15 / maxDim;
-                    else if (maxDim < 1) scale = 5 / maxDim;
+
+                    if (filename === 'aluminum_profiles.glb' || filename === 'tubes.glb') {
+                        scale = 35 / maxDim; // Forçar estes perfis a renderizarem com uma escala visivelmente maior
+                    } else if (maxDim > 20) {
+                        scale = 15 / maxDim;
+                    } else if (maxDim < 1) {
+                        scale = 5 / maxDim;
+                    }
 
                     this.currentLoadedModel.scale.setScalar(scale);
 

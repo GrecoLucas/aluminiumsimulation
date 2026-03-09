@@ -13,16 +13,16 @@ class App {
         // Parâmetros do GUI
         this.params = {
             // Modelo
-            model: 'conection.glb',
+            model: 'aluminum_profiles.glb',
             posX: 0, posY: 0, posZ: 0,
             rotX: 0, rotY: 0, rotZ: 0,
             scale: 1,
 
             // Material
-            colorPreset: '#FFFFFF',
-            customColor: '#FFFFFF',
+            colorPreset: '#E6D2B5',
+            customColor: '#E6D2B5',
             roughness: 0.3,
-            metalness: 0.1,
+            metalness: 1,
             clearcoat: 0.0,
             clearcoatRoughness: 0.1,
 
@@ -43,13 +43,13 @@ class App {
             'Cubo (Teste)': 'primitive:cube',
             'Cilindro (Teste)': 'primitive:cylinder',
             'Esfera (Teste)': 'primitive:sphere',
-            '--- Modelos GLB ---': '',
             'Conection': 'conection.glb',
-            'Cylinder': 'cylinder.glb',
+            'Aluminium profile single': 'cylinder.glb',
             'Machine Parts': 'machine_parts.glb',
             'Metalic Cube': 'metalic_cube.glb',
             'Spindle Bracket Holder': 'spindle_bracket_holder.glb',
-            'Tubes': 'tubes.glb'
+            'Tubes': 'tubes.glb',
+            'Aluminium profile': 'aluminum_profiles.glb'
         };
 
         this.init();
@@ -153,10 +153,9 @@ class App {
         this.guiControllers.scale = folderModel.add(this.params, 'scale', 0.1, 5).name('Escala Global').onChange(v => this.sceneModule.objects.product.scale.setScalar(v));
         // folderModel.open();
 
-        // 📁 Material
         const folderMat = this.gui.addFolder('Material');
 
-        const allColors = { 'Branco Puro': '#FFFFFF', ...RAL_COLORS, ...METAL_COLORS };
+        const allColors = { ...RAL_COLORS, ...METAL_COLORS };
 
         folderMat.add(this.params, 'colorPreset', allColors).name('Presets de Cor').onChange(v => {
             this.params.customColor = v;
